@@ -1,0 +1,89 @@
+import React, { Component } from 'react';
+import TaskItem from './TaskItem';
+import { element } from 'prop-types';
+
+class TaskList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filterName: '',
+      filterStatus: -1, // -1 = all, 1 = active, 0 = deactive
+    };
+  }
+  onChange = e => {
+    let target = e.target;
+    let name = target.name;
+    let value = target.value;
+    this.props.onFilter(
+      name === 'filterName' ? value : this.state.filterName,
+      name === 'filterStatus' ? value : this.state.filterStatus,
+    );
+    this.setState({
+      [name]: value,
+    });
+  };
+  onRemoveTask = childData => {
+    let indexTaskRemove = this.props.tasks.findIndex(task => task.id === childData);
+    this.props.onRemoveTask(indexTaskRemove);
+    console.log(indexTaskRemove);
+  };
+  onUpdateTask = childData => {
+    this.props.onUpdateTask(childData);
+  };
+  onUpdateStatus = childData => {
+    this.props.onUpdateStatus(childData);
+  };
+  render() {
+    let { tasks } = this.props;
+    let { filterName, filterStatus } = this.state;
+    let elementTasks = tasks.map((task, index) => (
+      <TaskItem
+        index={index}
+        task={task}
+        key={task.id}
+        id={task.id}
+        onRemoveTask={this.onRemoveTask}
+        onUpdateTask={this.onUpdateTask}
+        onUpdateStatus={this.onUpdateStatus}
+      />
+    ));
+
+    return (
+      <table className="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th className="text-center">STT</th>
+            <th className="text-center">Tên</th>
+            <th className="text-center">Trạng Thái</th>
+            <th className="text-center">Hành Động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>
+              <input
+                type="text"
+                className="form-control"
+                name="filterName"
+                value={filterName}
+                onChange={this.onChange}
+              />
+            </td>
+            <td>
+              <select className="form-control" name="filterStatus" value={filterStatus} onChange={this.onChange}>
+                <option value="-1">Tất Cả</option>
+                <option value="0">Ẩn</option>
+                <option value="1">Kích Hoạt</option>
+              </select>
+            </td>
+            <td></td>
+          </tr>
+          {elementTasks}
+        </tbody>
+      </table>
+    );
+  }
+}
+
+export default TaskList;
